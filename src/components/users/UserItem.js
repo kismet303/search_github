@@ -18,7 +18,9 @@ const UserItem = ({user: {login, avatar_url, html_url }}) => {
                 width: '60px'}} />
                 <h3>{login}</h3>
                 <div>    
-                    <Link to={`/user/`} className='btn btn-dark btn-sm my-1'/>
+                    <Link to={`/user/${login}`} className='btn btn-dark btn-sm my-1'>
+                    More
+                    </Link>
                </div>
             </div>
         )  

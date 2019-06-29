@@ -7,6 +7,7 @@ import Search from './components/users/Search';
 import axios from 'axios';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import About from "./pages/About.js";
+import Alert from "./components/layout/Alert.js";
 
 
 
@@ -15,8 +16,9 @@ class App extends Component {
     users: [],
     user: {},
     loading: false,
-    alert: null
-    }
+    alert: null,
+    repos: []
+    };
   
   // async componentDidMount(){
   //   this.setState({ loading: true});
@@ -44,14 +46,28 @@ const res = await axios.get(`https://api.github.com/search/users?q=${text}&clien
   getUser = async (username) => {
     this.setState({ loadiang: true})
 
-    const res = await axios.get(`https://api.github.com/users?q=${username}&client_id=
+    const res = await axios.get(`https://api.github.com/users/${username}?client_id=
     ${process.env.REACT_APP_GITHUB_CLIENT_ID}
     &client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`);
 
-    this.setState({ users: res.data, loading: false });
-
-
+    console.log("getting user info");
+    console.log(username);
+    console.log(res.data);
+    this.setState({ user: res.data, loading: false });
   }
+
+  getUserRepos = async (username) => {
+    this.setState({ loadiang: true})
+
+    const res = await axios.get(`https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=
+    ${process.env.REACT_APP_GITHUB_CLIENT_ID}
+    &client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`);
+
+    console.log("getting user repos");
+    this.setState({ repos: res.data, loading: false });
+  }
+
+
 
   // clear users from state
   clearUsers = () => {
@@ -62,10 +78,11 @@ const res = await axios.get(`https://api.github.com/search/users?q=${text}&clien
   setAlert = (msg, type) => {
     console.log(msg);
     this.setState({ alert: { msg, type}});
+    setTimeout(() => this.setState({ alert: null}), 3000);
   }
 
   render() {
-    const { users, user, loading } = this.state;
+    const { users, user, loading, repos} = this.state;
 
     return (
       <Router>
@@ -75,6 +92,7 @@ const res = await axios.get(`https://api.github.com/search/users?q=${text}&clien
           <Switch>
             <Route exact path='/' render={props =>(
               <Fragment>
+                <Alert alert={this.state.alert} />
                  <Search
                  searchUsers={this.searchUsers}
                  clearUsers={this.clearUsers}
@@ -84,8 +102,13 @@ const res = await axios.get(`https://api.github.com/search/users?q=${text}&clien
                </Fragment>
             )} />
             <Route exact path='/about' component={About}/>
-            <Route exact path='/user:login' render={props=>(
-              <User {...props } getUser={this.getUser} user={user}  loading={loading}/>
+            <Route exact path='/user/:login' render={props=>(
+            <User {...props } 
+            getUser={this.getUser} 
+            getUserRepos={this.getUserRepos} 
+            user={user}  
+            repos={repos}
+            loading={loading}/>
             )}/>
           </Switch>        
           </div>

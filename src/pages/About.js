@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+
 
 const About = props => {
     return (
@@ -10,7 +10,5 @@ const About = props => {
         </div>
     )
 }
-
-
 
 export default About
